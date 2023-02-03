@@ -873,6 +873,10 @@ void find_single_init(char name[], char text[]){
 }
 
 void find_lot_init(char name[], char text[]){
+    if(checkexfile(name)==0){
+        printf("file does not exist\n");
+        return;
+    }
     int len=strlen(text);
     FILE *file=fopen(name,"r");
     FILE *help=fopen("part1.txt","w");
@@ -1077,6 +1081,10 @@ void grep_exe(char pattern[], int mode){
     long long count=0;
     while(ex>0){
         int filecheck=0;
+        if(checkexfile(name)==0){
+            printf("file does not exist\n");
+            return;
+        }
         FILE *now=fopen(name,"r");
         ex2=fscanf(now,"%[^\n]s", line);
         fgetc(now);
@@ -1105,6 +1113,10 @@ void grep_exe(char pattern[], int mode){
 }
 
 void closingpairs(char name[]){
+    if(checkexfile(name)==0){
+        printf("file does not exist\n");
+        return;
+    }
     saver(name);
     FILE *file=fopen(name,"r");
     struct linkedlist *stream=create_linkedlist();
@@ -1187,6 +1199,14 @@ void closingpairs(char name[]){
 }
 
 void compare(char name1[], char name2[]){
+    if(checkexfile(name1)==0){
+        printf("file 1 does not exist\n");
+        return;
+    }
+    if(checkexfile(name2)==0){
+        printf("file 2 does not exist\n");
+        return;
+    }
     FILE *file1=fopen(name1,"r");
     FILE *file2=fopen(name2,"r");
     char c1[N],c2[N];
@@ -1270,7 +1290,7 @@ void tree(char *basePath, const int root, int depth){
                     printf("%c", 179);
                 }
                 else{
-                    printf(output, " ");
+                    printf(" ");
                 }
             }
             printf("%c%c%s\n", 195, 196, dp->d_name);
@@ -1287,6 +1307,10 @@ void tree(char *basePath, const int root, int depth){
 }
 
 void undo(char name[]){
+    if(checkexfile(name)==0){
+        printf("file does not exist\n");
+        return;
+    }
     char save[N]={0};
     swap(name, namesake(name,save));
     return;
@@ -1673,6 +1697,7 @@ int main(){
             //output_printer();
         }
         else{
+            while(getchar()!='\n');
             printf("no such function\n");
         }
     }
