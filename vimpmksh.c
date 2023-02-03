@@ -25,7 +25,8 @@ char A[N+1]={0};
 
 //start of declaring functions
 
-
+int checkexfile(char*);
+int checkexdir(char*);
 
 // end of declaring functions
 
@@ -103,6 +104,38 @@ void removelist(struct linkedlist *list, int n){
 
 //start of functions
 
+int *pathmaker(char path[], int pathdash[]){
+    int count=0;
+    for(int i=0; i<N; i++){
+        if(path[i]=='/'){
+            count+=1;
+            pathdash[count]=i;
+        }
+    }
+    int pathlen=count;
+    return pathdash;
+}
+
+int createsave(char name[]){
+    if(checkexfile(name)==1){
+        return 0;
+    }
+    int pathdash[N+1]={0};
+    pathmaker(name, pathdash);
+    int i=1;
+    while(pathdash[i]!=0){
+        char cur_path[N];
+        strncpy(cur_path,name, pathdash[i]);
+        if(checkexdir(cur_path)==0){
+            mkdir(cur_path);
+        }
+        i++;
+    }
+    FILE *f = fopen(name, "w");
+    fclose(f);
+    return 1;
+}
+
 //1 mirize to 2
 void fill_file(char name1[],char name2[]){
     FILE *file1=fopen(name1, "r");
@@ -128,6 +161,7 @@ char *namesake(char name[],char save[]){
 void saver(char name[]){
     char save[N]={0};
     strcpy(save,namesake(name,save));
+    createsave(save);
     fill_file(name,save);
     return;
 }
@@ -303,18 +337,6 @@ int checkexfile(char address[]){
     }
 }
 
-int *pathmaker(char path[], int pathdash[]){
-    int count=0;
-    for(int i=0; i<N; i++){
-        if(path[i]=='/'){
-            count+=1;
-            pathdash[count]=i;
-        }
-    }
-    int pathlen=count;
-    return pathdash;
-}
-
 //int makedir(char name)
 
 int createfile(char name[]){
@@ -326,7 +348,7 @@ int createfile(char name[]){
     pathmaker(name, pathdash);
     int i=1;
     while(pathdash[i]!=0){
-        char cur_path[N];
+        char cur_path[N]={0};
         strncpy(cur_path,name, pathdash[i]);
         if(checkexdir(cur_path)==0){
             mkdir(cur_path);
