@@ -1267,14 +1267,12 @@ void tree(char *basePath, const int root, int depth){
         if (strcmp(dp->d_name, ".") != 0 && strcmp(dp->d_name, "..") != 0){
             for (i=0; i<root; i++){
                 if (i%2 == 0 || i == 0){
-                    //fprintf(output, "%c", 179);
                     printf("%c", 179);
                 }
                 else{
-                    fprintf(output, " ");
+                    printf(output, " ");
                 }
             }
-            //fprintf(output, "%c%c%s\n", 195, 196, dp->d_name);
             printf("%c%c%s\n", 195, 196, dp->d_name);
             if((depth==-1)||(depth>=root/2+1)){
                 strcpy(path, basePath);
