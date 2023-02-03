@@ -20,7 +20,7 @@
 
 //start of global variables
 #define N 10000//input size limit
-
+char A[N+1]={0};
 //end of global variables
 
 //start of declaring functions
@@ -131,6 +131,8 @@ void saver(char name[]){
     fill_file(name,save);
     return;
 }
+
+
 
 void swap(char name1[], char name2[]){
     fill_file(name1,"part1.txt");
@@ -244,31 +246,32 @@ long long chartoword(char name[], int cn){
 
 long long standardize(char name[], int line, int dep){
     FILE *file=fopen(name,"r");
-    int newline_counter=0, lastline=-1;
-    char c;
-    long long i=0;
+    int newline_counter=0, lastline=-1, i=0;
+    if((line==1)&&(dep==0)){
+        fclose(file);
+        return 0;
+    }
+    char c=fgetc(file);
     while(1){
         i++;
-        c=fgetc(file);
-        if(c==EOF){
-            fclose(file);
-            return -1;;
-        }
-        if(c=='\n'){
-            newline_counter++;
-        }
         if(newline_counter==line-1){
             lastline++;
         }
-        if((lastline==dep+1)){
+        if((newline_counter==line-1)&&(dep==lastline)){
             break;
         }
+        if((c==EOF)){
+            return -1;
+        }
+        if(c=='\n'){
+            if(newline_counter==line-1){
+                return -1;
+            }
+            newline_counter++;
+        }
+        c=fgetc(file);
     }
-    if (line>1){
-        i++;
-    }
-    fclose(file);
-    return i-2;
+    return i-1;
 }
 
 char *fix_name(char name[]){
@@ -342,7 +345,7 @@ int insertstr(char name[], char text[], long long place){
         return 0;
     }
     if(place==-1){
-        printf("no such position");
+        printf("no such position\n");
         return 0;
     }
     saver(name);
@@ -415,7 +418,7 @@ int removestr(char name[], int place, int size){
         return 0;
     }
     if(place<0){
-        printf("no such position");
+        printf("no such position\n");
         return 0;
     }
     FILE *file=fopen(name,"r");
@@ -431,7 +434,7 @@ int removestr(char name[], int place, int size){
     for(int i=0; i<size; i++){
         c=fgetc(file);
         if(c==EOF){
-            printf("no such position");
+            printf("no such position\n");
             fclose(part1w);
             fclose(file);
             fclose(mem);
@@ -925,7 +928,7 @@ void find_lot_init(char name[], char text[]){
     if(single==1){
         fclose(part1r);
         fclose(file);
-        find_single_init(name,text);
+        find_single_init(name,check->next->c);
         return;
     }
     char b[N]={0};
@@ -1014,7 +1017,7 @@ void find_exe(char name[], int mode, int outtype, int ifat){
         return;
     }
     if(mode==1){
-        fprintf(output, "%lld", count);
+        fprintf(output, "%lld\n", count);
         fclose(output);
         return;
     }
@@ -1111,14 +1114,22 @@ void closingpairs(char name[]){
         add(stream, &c, 1, 0, 0);
         c=fgetc(file);
     }
+    c='\0';
+    add(stream, &c, 1, 0, 0);
     fclose(file);
     int depth=0;
     stream=stream->next;
     while(1){
         if(*(stream->c)=='{'){
             depth++;
-            while(*(stream->next->c)==' '){
+            while((*(stream->next->c)==' ')||(*(stream->next->c)=='\n')||(*(stream->next->c)=='\t')){
                 removelist(stream->next,0);
+            }/*
+            while((*(stream->prev->c)==' ')||(*(stream->prev->c)=='\n')||(*(stream->prev->c)=='\t')){
+                removelist(stream->prev,0);
+            }*/
+            if(!((*(stream->prev->c)==' ')||(*(stream->prev->c)=='\n')||(*(stream->prev->c)=='\t'))){
+                insertlist(stream->prev,0," ");
             }
             if(*(stream->next->c)=='}'){
                 insertlist(stream,0,"\n");
@@ -1166,7 +1177,7 @@ void closingpairs(char name[]){
     putter=putter->next;
     while(1){
         fputc(*(putter->c),now);
-        if(putter->next==NULL){
+        if(*(putter->next->c)=='\0'){
             break;
         }
         putter=putter->next;
@@ -1292,6 +1303,7 @@ char waste(){
 }
 
 char *getstr(char output[]){
+    strcpy(output,A);
     int i=-1, mode=0;
     char c,b=waste();
     if(b=='\n'){
@@ -1335,6 +1347,61 @@ char *getstr(char output[]){
         }
         else{
             output[i]=b;
+        }
+
+    }
+    if(mode==0){
+        getchar();
+    }
+    return output;
+}
+
+char *getstr2(){
+    char *output=calloc(N,sizeof(char));
+    strcpy(output,A);
+    int i=-1, mode=0;
+    char c,b=waste();
+    if(b=='\n'){
+        char ll[1]={0};
+        strcpy(output,ll);
+        return output;
+    }
+    if(b!='\"'){
+        i++;
+        *(output+i)=b;
+        mode=1;
+    }
+    while(1){
+        i++;
+        c=b;
+        b=getchar();
+        if(((b==' ')||(b=='\n')||(b==EOF))&&(mode==1)){
+            break;
+        }
+        if((mode==0)&&(b=='\"')){
+            break;
+        }
+        if(b=='\\'){
+            c=b;
+            b=getchar();
+            if(b==' '){
+                break;
+            }
+            if(b=='n'){
+                *(output+i)='\n';
+            }
+            else if(b=='\\'){
+                *(output+i)='\\';
+            }
+            else if(b=='\"'){
+                *(output+i)='\"';
+            }
+            else{
+                *(output+i)=b;
+            }
+        }
+        else{
+            *(output+i)=b;
         }
 
     }
@@ -1407,12 +1474,9 @@ int main(){
     char a[100]="amo\nrmio";
     //scanf("%s", a);
     char b[]="./root/amo.txt";
-    char c[]="./root/pingus.txt";
+    char c[]="./root/sina.txt";
     char s[]="a* *b *c";
     char t[]="khar yes";
-    //insertstr(b,a,5);
-    //tree("./root/", 0,-1);
-    //cat(b);
     char input[N]={0};
     int arman=0;
     while(1){
@@ -1442,6 +1506,22 @@ int main(){
             getstr(fname);
             cat(fname);
             output_printer();
+            printf("\n");
+        }
+        else if(strcmp("removestr",input)==0){
+            char *fname=calloc(N,sizeof(char));
+            int line=0, dep=0, size, mode=0;
+            char flag;
+            getstr(fname);
+            scanf("%d:%d", &line, &dep);
+            scanf("%d", &size);
+            waste();
+            flag=getchar();
+            long long pl=standardize(fname,line,dep);
+            if(flag=='b'){
+                pl=pl-size+1;
+            }
+            removestr(fname,pl,size);
         }
         else if(strcmp("copystr",input)==0){
             char *fname=calloc(N,sizeof(char));
@@ -1559,10 +1639,11 @@ int main(){
             if(c=='r'){mode=0;}
             if(c=='c'){mode=1;}
             if(c=='l'){mode=2;}
-            getstr(str);
+            str=getstr2();
             while(*str!=0){
                 fprintf(grepfiles, "%s\n", str);
-                getstr(str);
+                strcpy(str,A);
+                str=getstr2();
             }
             fclose(grepfiles);
             grep_exe(pattern,mode);
